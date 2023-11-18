@@ -4,7 +4,7 @@ export default{
   // 查询所有菜单数据
   getAllMenu(){
     return request({
-      url: '/system/menu',
+      url: '/menu',
       method: 'get',
     });
   },

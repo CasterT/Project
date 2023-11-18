@@ -4,10 +4,10 @@ export default{
   // 分页查询角色列表
   getRoleList(searchModel){
     return request({
-      url: '/system/role/list',
+      url: '/indent/list',
       method: 'get',
       params: {
-        roleName: searchModel.roleName,
+        indentTitle: searchModel.indentTitle,
         pageNo: searchModel.pageNo,
         pageSize: searchModel.pageSize
       }
@@ -16,7 +16,7 @@ export default{
   // 新增
   addRole(role){
     return request({
-      url: '/system/role',
+      url: '/indent',
       method: 'post',
       data: role
     });
@@ -24,14 +24,14 @@ export default{
   // 修改
   updateRole(role){
     return request({
-      url: '/system/role',
+      url: '/indent',
       method: 'put',
       data: role
     });
   },
   // 保存角色数据
   saveRole(role){
-    if(role.roleId == null || role.roleId == undefined){
+    if(role.indentId == null && role.indentId == undefined){
       return this.addRole(role);
     }
     return this.updateRole(role);
@@ -39,24 +39,22 @@ export default{
   // 根据id查询
   getRoleById(id){
     return request({
-      url: `/system/role/${id}`,
+      url: `/indent/${id}`,
       method: 'get'
     });
   },
   // 根据id删除
   deleteRoleById(id){
     return request({
-      url: `/system/role/${id}`,
+      url: `/indent/${id}`,
       method: 'delete'
     });
   },
   // 查询所有角色列表
 getAllRole(){
   return request({
-      url: '/system/role/all',
+      url: '/indent/all',
       method: 'get'
   });
 },
-
-
 }

@@ -15,22 +15,21 @@
 
     <!-- 结果列表 -->
     <el-card>
-
         <el-table :data="roleList" stripe style="width: 100%">
           <el-table-column label="#" width="80">
             <template slot-scope="scope">
               {{(searchModel.pageNo-1) * searchModel.pageSize + scope.$index + 1}}
             </template>
           </el-table-column>
-          <el-table-column prop="roleId" label="订单编号" width="180">
+          <el-table-column prop="indentId" label="订单编号" width="180">
           </el-table-column>
-          <el-table-column prop="roleName" label="订单名称" width="180">
+          <el-table-column prop="indentTitle" label="订单名称" width="180">
           </el-table-column>
-          <el-table-column prop="roleDesc" label="订单描述" >
+          <el-table-column prop="price" label="价格" >
           </el-table-column>
           <el-table-column   label="操作" width="180">
             <template slot-scope="scope">
-              <el-button @click="openEditUI(scope.row.roleId)" type="primary" icon="el-icon-edit" circle size="mini"></el-button>
+              <el-button @click="openEditUI(scope.row.indentId)" type="primary" icon="el-icon-edit" circle size="mini"></el-button>
               <el-button @click="deleteRole(scope.row)" type="danger" icon="el-icon-delete" circle size="mini"></el-button>
             </template>
           </el-table-column>
@@ -50,29 +49,34 @@
     <!-- 对话框 -->
     <el-dialog @close="clearForm" :title="title" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <el-form :model="roleForm" ref="roleFormRef" :rules="rules">
-        <el-form-item prop="roleName" label="订单名称" :label-width="formLabelWidth">
-          <el-input v-model="roleForm.roleName" autocomplete="off"></el-input>
+        <el-form-item prop="indentId" label="订单编号" :label-width="formLabelWidth">
+          <el-input v-model="roleForm.indentId" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="indentTitle" label="订单名称" :label-width="formLabelWidth">
+          <el-input v-model="roleForm.indentTitle" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="price" label="价格" :label-width="formLabelWidth">
+          <el-input v-model="roleForm.price" autocomplete="off"></el-input>
         </el-form-item>
 
-        <el-form-item prop="roleDesc" label="订单描述" :label-width="formLabelWidth">
-          <el-form-item
-              prop="roleDesc"
+        <el-form-item
+              prop="nickName"
               label="权限设置"
               :label-width="formLabelWidth"
               >
-    <el-tree
-            ref="menuRef"
-             :data="menuList"
-             :props="menuProps"
-             node-key="menuId"
-             show-checkbox
-             style="width:85%"
-             default-expand-all
-             ></el-tree>
-</el-form-item>
-
-
-          <el-input v-model="roleForm.roleDesc" autocomplete="off"></el-input>
+              <el-form-item prop="nickName" label="所属用户" :label-width="formLabelWidth">
+                <el-input v-model="roleForm.nickName" autocomplete="off"></el-input>
+              </el-form-item>
+            <el-tree
+              ref="menuRef"
+              :data="menuList"
+              :props="menuProps"
+              node-key="menuId"
+              show-checkbox
+              style="width:85%"
+              default-expand-all
+              >
+            </el-tree>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -89,7 +93,6 @@ import roleApi from '@/api/roleManage';
 import menuApi from '@/api/menuManage';
 export default {
   data(){
-
     return{
       menulist:[],
       menuProps:{
@@ -97,7 +100,15 @@ export default {
         label:'title'
       },
       formLabelWidth: '130px',
-      roleForm: {},
+      roleForm: {
+        openId: "12534535",
+        inviteCode: "112341",
+        indentNo:"1",
+        productType: 1,
+        indentStatus: 1,
+        createTime: "13",
+        updateTime: "13"
+      },
       dialogFormVisible: false,
       title: '',
       searchModel: {
@@ -115,16 +126,21 @@ export default {
     }
   },
   methods:{
+    getAllMenu(){
+      menuApi.getAllMenu().then(response=>{
+        this.menulist = response.data;
+      })
+    },
     deleteRole(role){
-      this.$confirm(`您确定删除订单吗${role.roleName} ？`, '提示', {
+      this.$confirm(`您确定删除订单${role.indentTitle} ？`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
       }).then(() => {
-        roleApi.deleteRoleById(role.roleId).then(response => {
+        roleApi.deleteRoleById(role.indentId).then(response => {
           this.$message({
             type: 'success',
-            message: response.message
+            message: '删除成功'
           });
           this.dialogFormVisible = false;
           this.getRoleList();
@@ -140,15 +156,10 @@ export default {
     saveRole(){
       let selected=this.$refs.menuRef.getCheckedKeys();
       let halfSelect=this.$refs.menuRef.getHalfCheckedKeys();
-      this.roleForm.menuIDList=selected.concat(halfSelect);
-      // 触发表单验证
-      this.$refs.roleFormRef.validate((valid) => {
-        if (valid) {
-          // 提交保存请求
+      this.roleForm.menuIDList=1;//selected.concat(halfSelect);
           roleApi.saveRole(this.roleForm).then(response => {
-            // 成功提示
             this.$message({
-              message: response.message,
+              message: "操作成功",
               type: 'success'
             });
             // 关闭对话框
@@ -156,13 +167,6 @@ export default {
             // 刷新表格数据
             this.getRoleList();
           });
-
-        } else {
-          console.log('error submit!!');
-          return false;
-        }
-      });
-
     },
     clearForm(){
       this.roleForm = {};

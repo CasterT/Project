@@ -31,15 +31,23 @@ module.exports = {
   productionSourceMap: false,
 
   devServer: {
-   proxy: 'http://82.156.138.231:9999',
+    proxy: {
+      '/system': {
+        target: 'http://120.24.189.44:8080',//后端接口地址
+        changeOrigin: true,//是否允许跨越
+        pathRewrite: {
+            '^/system': 'http://120.24.189.44:8080/system'//重写,
+        }
+      }
+    },
     port: port,
-    open: false,
+    open: true,
     overlay: {
       warnings: false,
       errors: true
     },
-  //  before: require('./mock/mock-server.js')
-  },
+  // //  before: require('./mock/mock-server.js')
+   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
